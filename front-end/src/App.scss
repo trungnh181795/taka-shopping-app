@@ -1,0 +1,30 @@
+@import "~bootstrap/scss/bootstrap";
+@import '~antd/dist/antd.css';
+
+#root {
+    background-color: #f2f3f4;
+}
+
+.taka-text-title {
+    font-size: 2rem;
+    line-height: 2.4rem;
+    font-weight: 500;
+}
+
+.taka-text-header {
+    font-size: 1.5rem;
+    line-height: 1.9rem;
+    font-weight: 500;
+}
+
+.taka-text-description {
+    font-size: 1rem;
+    line-height: 1.4rem;
+    font-weight: 300;
+}
+
+.taka-text-note {
+    font-size: 0.5rem;
+    line-height: 0.9rem;    
+    font-weight: 300;
+}
