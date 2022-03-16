@@ -21,7 +21,7 @@ const QuantityInput = ({ defaultValue, onInputChange }) => {
         -
       </button>
       <input
-        className="product-quantity-input"
+        className="product-quantity-input text-center taka-text-sm-normal"
         name="modify"
         value={inputValue}
         onChange={(e) => {

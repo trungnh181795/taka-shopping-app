@@ -5,11 +5,13 @@ import { useSelector, useDispatch } from "react-redux";
 
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
-import ReviewItem from "../../components/ReviewItem";
+import Review from "../../components/Review";
 import QuantityInput from "../../components/QuantityInput";
+import Rating from "../../components/Rating";
 
 import { listProductDetails } from "../../actions/productActions";
 import { cartAddItem } from "../../actions/cartActions";
+import { checkImgUrl } from "../../utilities/checkImgUrl";
 
 import shoppingCart from "../../assets/shopping-cart.png";
 
@@ -38,16 +40,16 @@ const ProductDetail = () => {
   const handleOnClick = (buttonType) => {
     if (userInfo && userInfo.isActive) {
       dispatch(cartAddItem(product, quantity));
-      if(buttonType === "buy") navigate("/cart"); 
+      if (buttonType === "buy") navigate("/cart");
     } else {
       navigate("/signin");
     }
   };
 
   const changeAlertStatus = () => {
-    setIsAlerted(prev => !prev);
-    setTimeout(() => setIsAlerted(prev => !prev), 2000);
-  }
+    setIsAlerted((prev) => !prev);
+    setTimeout(() => setIsAlerted((prev) => !prev), 2000);
+  };
 
   useEffect(() => {
     dispatch(listProductDetails(params.id));
@@ -59,64 +61,77 @@ const ProductDetail = () => {
 
   return (
     <>
-      <div>
+      <div className="my-3">
         <button
-          className="btn-back my-2"
+          className="btn-back"
           type="button"
           onClick={() => navigate("/")}
         >
           {"< Back"}
         </button>
         {isAlerted ? (
-          <Message variant="success">Added {quantity} item to your cart!</Message>
+          <Message variant="success">
+            Added {quantity} item to your cart!
+          </Message>
         ) : null}
       </div>
-      <div className="product-detail">
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Message variant="danger">{error}</Message>
-        ) : (
-          <>
-            <Row>
+
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Message variant="danger">{error}</Message>
+      ) : (
+        <>
+          <div className="taka-white-frame px-3 py-3 my-3">
+            <Row className="my-2">
               <Col className="my-3 my-lg-0" xs={12} lg={5}>
-                {imgSrc !== "" ? <Image src={imgSrc} fluid /> : null}
+                {checkImgUrl(imgSrc) ? <Image className="mb-2" src={imgSrc} fluid /> : null}
+
                 {product.images ? (
-                  product.images.map((image, index) => (
-                    <Image
-                      className={`product-detail-images`}
-                      key={index}
-                      src={image.url}
-                      alt={`${index}`}
-                      fluid
-                      onClick={(e) => setImgSrc(e.target.src)}
-                      onMouseEnter={(e) => setImgSrc(e.target.src)}
-                    />
-                  ))
+                  product.images.map((image, index) => {
+                    if(checkImgUrl(image.url)) {
+                      return (
+                        <Image
+                          className={`product-images me-1`}
+                          key={index}
+                          src={image.url}
+                          alt={`${index}`}
+                          fluid
+                          onClick={(e) => setImgSrc(e.target.src)}
+                          onMouseEnter={(e) => setImgSrc(e.target.src)}
+                        />
+                      )
+                    }
+                    return <Message key={index} variant="warning">No image to show</Message>
+                  })
                 ) : (
                   <Message variant="warning">No image to show</Message>
                 )}
               </Col>
-              <Col className="my-3 my-lg-0" xs={12} lg={7}>
-                <div className="product-brand mb-2">{product.brand}</div>
-                <div className="product-name mb-2">{product.name}</div>
+              <Col className="my-3 my-lg-0" md={12} lg={7}>
+                <div className="product-brand taka-text-sm-bold mb-2">
+                  {product.brand}
+                </div>
+                <div className="taka-text-lg-bold mb-2">{product.name}</div>
                 <div className="d-flex">
-                  <div className="product-stat">{`Rating: ${product.rating}/5`}</div>
-                  <div className="product-stat">
+                  <Rating value={product.rating} />
+                  <div className="taka-text-sm-normal ms-2 pe-4">
                     Count in stock: {product.countInStock}
                   </div>
                 </div>
 
-                <div className="product-price my-3">$ {product.price}</div>
-                <Row className="my-2">
+                <div className="d-flex justify-content-start align-items-center product-price taka-text-lg-bold py-4 px-3 my-3">
+                  $ {product.price}
+                </div>
+                <Row className="my-4">
                   <Col className="text-muted" sm lg={2}>
                     Description
                   </Col>
-                  <Col className="product-description" sm lg={10}>
-                    {product.description}                 
+                  <Col className="taka-text-sm-normal" sm lg={10}>
+                    {product.description}
                   </Col>
                 </Row>
-                <Row className="my-2">
+                <Row className="my-4">
                   <Col className="text-muted" sm lg={2}>
                     Quantity
                   </Col>
@@ -127,17 +142,16 @@ const ProductDetail = () => {
                     />
                   </Col>
                 </Row>
-                <div className="product-detail-footer justify-self-end">
+                <div className="px-1 py-1">
                   <button
                     className="btn-add-to-cart mx-2"
                     type="button"
                     onClick={() => {
-                        if(!isAlerted) {
-                          handleOnClick("add_item");
-                          changeAlertStatus();
-                        }
+                      if (!isAlerted) {
+                        handleOnClick("add_item");
+                        changeAlertStatus();
                       }
-                    }
+                    }}
                   >
                     <img
                       className="btn-add-to-cart-icon"
@@ -156,21 +170,10 @@ const ProductDetail = () => {
                 </div>
               </Col>
             </Row>
-            <div className="product-reviews my-3">
-              <div className="product-reviews-title">Reviews</div>
-              <ul className="product-reviews-list">
-                {reviews && reviews.result ? (
-                  reviews.result.map((review, index) => (
-                    <ReviewItem key={index} review={review} />
-                  ))
-                ) : (
-                  <Message variant="warning">There is no review yet!</Message>
-                )}
-              </ul>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+          <Review reviews={reviews}/>
+        </>
+      )}
     </>
   );
 };

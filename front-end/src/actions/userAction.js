@@ -1,17 +1,90 @@
-import axios from "axios";
-
 import {
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
   USER_LOGIN_SUCCESS,
   USER_LOGOUT,
-  USER_REGISTER_FAIL,
   USER_REGISTER_REQUEST,
   USER_REGISTER_SUCCESS,
+  USER_REGISTER_FAIL,
+  USER_DETAILS_REQUEST,
+  USER_DETAILS_SUCCESS,
+  USER_DETAILS_FAIL,
   USER_DETAILS_RESET,
-  ORDER_LIST_MY_RESET,
+  USER_UPDATE_PROFILE_REQUEST,
+  USER_UPDATE_PROFILE_SUCCESS,
+  USER_UPDATE_PROFILE_FAIL,
+  USER_UPDATE_PROFILE_RESET,
+  USER_LIST_REQUEST,
+  USER_LIST_SUCCESS,
+  USER_LIST_FAIL,
   USER_LIST_RESET,
+  USER_DELETE_REQUEST,
+  USER_DELETE_SUCCESS,
+  USER_DELETE_FAIL,
+  USER_UPDATE_REQUEST,
+  USER_UPDATE_SUCCESS,
+  USER_UPDATE_FAIL,
+  USER_UPDATE_RESET,
 } from "../constants/userConstants";
+import { ORDER_LIST_MY_RESET } from "../constants/orderConstants";
+
+import { instance } from '../utilities/axiosInstance';
+
+export const userUpdateProfile =
+  (user, typeOfInfo) => async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: USER_UPDATE_PROFILE_REQUEST,
+      });
+
+      const {
+        userLogin: { userTokens },
+      } = getState();
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userTokens.access.token}`,
+        },
+      };
+
+      const { data } = await instance.patch(
+        `/users/change-${typeOfInfo}`,
+        user,
+        config
+      );
+
+      console.log('data', data)
+
+      const userInfo = data.data;
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+      dispatch({
+        type: USER_UPDATE_PROFILE_SUCCESS,
+      });
+
+      dispatch({
+        type: USER_LOGIN_SUCCESS,
+        payload: {
+          userInfo: userInfo,
+          userTokens: userTokens,
+        },
+      });
+
+      localStorage.setItem("userInfo", JSON.stringify(data.data));
+    } catch (error) {
+      console.dir(error)
+      dispatch({
+        type: USER_UPDATE_PROFILE_FAIL,
+        payload: error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message,
+      });
+      //
+
+    }
+  };
+
+export const userDetails = () => async (dispatch, getState) => {};
 
 export const register =
   ({ username, email, password }) =>
@@ -27,11 +100,8 @@ export const register =
         },
       };
 
-      console.log("name", username);
-      console.log("mail", email);
-      console.log("pass", password);
-      const { data } = await axios.post(
-        "https://ec-jsmock.xyz/v1/auth/register",
+      const { data } = await instance.post(
+        "/auth/register",
         { username, email, password },
         config
       );
@@ -72,28 +142,28 @@ export const login =
         },
       };
 
-      const { data } = await axios.post(
-        "https://ec-jsmock.xyz/v1/auth/login",
+      const { data } = await instance.post(
+        "/auth/login",
         { email, password, deviceId },
         config
       );
+
       const userTokens = data.data.tokens;
       const userInfo = data.data.user;
-      localStorage.setItem("userToken", JSON.stringify(userTokens));
+
+      localStorage.setItem("userTokens", JSON.stringify(userTokens));
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      localStorage.setItem("deviceId", JSON.stringify(deviceId));
 
       dispatch({
         type: USER_LOGIN_SUCCESS,
         payload: {
           userInfo,
-          userTokens
+          userTokens,
+          deviceId
         },
       });
-      
     } catch (error) {
-      console.log("err", error)
-      const errBool = Boolean(error.response && error.response.data.message);
-      console.log("errRes", errBool)
       dispatch({
         type: USER_LOGIN_FAIL,
         payload:
@@ -104,14 +174,29 @@ export const login =
     }
   };
 
-  export const logout = () => (dispatch) => {
-    localStorage.removeItem('userInfo')
-    localStorage.removeItem('cartItems')
-    localStorage.removeItem('shippingAddress')
-    localStorage.removeItem('paymentMethod')
-    dispatch({ type: USER_LOGOUT })
-    dispatch({ type: USER_DETAILS_RESET })
-    dispatch({ type: ORDER_LIST_MY_RESET })
-    dispatch({ type: USER_LIST_RESET })
-    document.location.href = '/signin'
+export const logout = () => async (dispatch, getState) => {
+  try {
+    const { userTokens, deviceId } = getState().userLogin;
+    const refreshToken = userTokens?.refresh?.token;
+
+    localStorage.clear();
+
+    dispatch({ type: USER_LOGOUT });
+    dispatch({ type: USER_DETAILS_RESET });
+    dispatch({ type: ORDER_LIST_MY_RESET });
+    dispatch({ type: USER_LIST_RESET });
+    document.location.href = "/signin";
+
+    await instance.post(
+      "/auth/logout",
+      {
+        refreshToken: refreshToken,
+        deviceId: deviceId
+      }
+    )
+
   }
+  catch (error) {
+    console.log(error)
+  }
+};

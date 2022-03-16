@@ -1,30 +1,74 @@
 @import "~bootstrap/scss/bootstrap";
 @import '~antd/dist/antd.css';
+@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css";
 
 #root {
     background-color: #f2f3f4;
 }
 
-.taka-text-title {
+.taka-white-frame {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 5px;
+  }
+
+.taka-text-lg-bold {
     font-size: 2rem;
     line-height: 2.4rem;
     font-weight: 500;
 }
 
-.taka-text-header {
+.taka-text-lg-normal {
+    font-size: 2rem;
+    line-height: 2.4rem;
+    font-weight: 400;
+}
+
+.taka-text-md-bold {
     font-size: 1.5rem;
     line-height: 1.9rem;
     font-weight: 500;
 }
 
-.taka-text-description {
-    font-size: 1rem;
-    line-height: 1.4rem;
-    font-weight: 300;
+.taka-text-md-normal {
+    font-size: 1.5rem;
+    line-height: 1.9rem;
+    font-weight: 400;
 }
 
-.taka-text-note {
-    font-size: 0.5rem;
-    line-height: 0.9rem;    
-    font-weight: 300;
+.taka-text-sm-bold {
+    font-size: 1rem;
+    line-height: 1.3rem;
+    font-weight: 500;
+}
+
+.taka-text-sm-normal {
+    font-size: 1rem;
+    line-height: 1.3rem;
+    font-weight: 400;
+}
+
+.taka-text-xs-bold {
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    font-weight: 500;
+}
+
+.taka-text-xs-normal {
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    font-weight: 400;
+}
+
+.form-error {
+    color: #c0392b;
+}
+
+.divider-vertical {
+  border-right: 1px solid #f2f3f4;
+}
+
+.divider-horizontal {
+  border-bottom: 1px solid #f2f3f4;
 }

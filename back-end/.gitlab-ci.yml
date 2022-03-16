@@ -1,0 +1,44 @@
+stages:
+  - publish
+  - build
+  - test
+  - release
+  - deploy
+
+variables:
+  TAG_LATEST: registry.gitlab.com/ecteam2022/bk_java_proshop/master_g3_be_main
+  TAG_COMMIT: registry.gitlab.com/ecteam2022/bk_java_proshop/master_g3_be_main:$CI_COMMIT_SHORT_SHA
+
+publish:
+  image: docker:latest
+  stage: publish
+  services:
+    - docker:dind
+  script:
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+
+deploy:
+  image: alpine:latest
+  stage: deploy
+  tags:
+    - deployment
+  before_script:
+    - apk update && apk add openssh-client bash
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - ssh -o StrictHostKeyChecking=no -l deployer -p 22 137.184.207.13 "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -o StrictHostKeyChecking=no -l deployer -p 22 137.184.207.13 "docker pull $TAG_COMMIT"
+    - ssh -o StrictHostKeyChecking=no -l deployer -p 22 137.184.207.13 "docker container rm -f node-app-proshop || true"
+    - ssh -o StrictHostKeyChecking=no -l deployer -p 22 137.184.207.13 "docker run -d -p 5000:9999 --name node-app-proshop $TAG_COMMIT"
+  environment:
+    name: deployment
+    url: $URL_SERVER
+  only:
+    refs:
+      - Master_G3_BE_Main

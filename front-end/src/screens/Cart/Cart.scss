@@ -1,0 +1,16 @@
+.cart {
+    padding: 20px 0;
+    
+    &-buy-btn {
+        background-color: #212529;
+        color: #61dafb;
+        border: 1px solid #212529;
+        border-radius: 5px;
+        padding: 10px 20px;
+
+        &:hover {
+            background-color: #383f45;
+        }
+
+    }
+}

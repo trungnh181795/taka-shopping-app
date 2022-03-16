@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   PRODUCT_LIST_REQUEST,
   PRODUCT_LIST_SUCCESS,
@@ -21,14 +20,16 @@ import {
 } from "../constants/productConstants";
 import { logout } from './userAction'
 
+import { instance } from '../utilities/axiosInstance';
+
 export const listProducts =
   (pageNumber = "") =>
   async (dispatch) => {
     try {
       dispatch({ type: PRODUCT_LIST_REQUEST });
 
-      const { data } = await axios.get(
-        `https://ec-jsmock.xyz/v1/products?size=36&page=${pageNumber}`
+      const { data } = await instance.get(
+        `/products?size=36&page=${pageNumber}`
       );
 
       dispatch({
@@ -50,7 +51,7 @@ export const listProductDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_DETAILS_REQUEST });
 
-    const { data } = await axios.get(`https://ec-jsmock.xyz/v1/products/${id}`);
+    const { data } = await instance.get(`/products/${id}`);
 
     dispatch({
       type: PRODUCT_DETAILS_SUCCESS,
@@ -83,7 +84,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
         },
       }
   
-      await axios.delete(`https://ec-jsmock.xyz/v1/products/${id}`, config)
+      await instance.delete(`/products/${id}`, config)
   
       dispatch({
         type: PRODUCT_DELETE_SUCCESS,
@@ -119,8 +120,8 @@ export const createProduct = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.post(
-      "https://ec-jsmock.xyz/v1/products",
+    const { data } = await instance.post(
+      "/products",
       {},
       config
     );

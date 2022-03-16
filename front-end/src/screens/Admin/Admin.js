@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { Table, Button, Row, Col } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,6 +40,10 @@ const Admin = () => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
+  useLayoutEffect(() => {
+    if(!userInfo.username) navigate('/signin')
+  })
+
   useEffect(() => {
     dispatch({ type: PRODUCT_CREATE_RESET });
 
@@ -71,7 +75,7 @@ const Admin = () => {
       dispatch(deleteProduct(id));
     }
   };
-  
+
   return (
     <>
       <Row className="align-items-center">
@@ -126,7 +130,7 @@ const Admin = () => {
                       className="btn-sm"
                       onClick={() => deleteHandler(product.id)}
                     >
-                      <button>Delete</button>
+                      Delete
                     </Button>
                   </td>
                 </tr>

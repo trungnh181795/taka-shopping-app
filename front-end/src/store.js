@@ -10,7 +10,16 @@ import {
 } from "./reducers/productReducer";
 
 import { cartReducer } from './reducers/cartReducer';
-import { userLoginReducer, userRegisterReducer } from "./reducers/userReducer";
+import {
+  userLoginReducer,
+  userRegisterReducer,
+  userUpdateProfileReducer
+} from "./reducers/userReducer";
+
+import {
+  orderCreateReducer,
+  orderListMyReducer
+} from './reducers/orderReducer';
 
 const cartItemsFromStorage = localStorage.getItem("cartItems")
   ? JSON.parse(localStorage.getItem("cartItems"))
@@ -26,14 +35,21 @@ const userTokensFromStorage = localStorage.getItem("userTokens")
   ? JSON.parse(localStorage.getItem("userTokens"))
   : {};
 
+const deviceIdFromStorage = localStorage.getItem("deviceId")
+  ? JSON.parse(localStorage.getItem("deviceId"))
+  : "";
+
 const reducer = combineReducers({
   productList: productListReducer,
   productDetail: productDetailReducer,
-  userLogin: userLoginReducer,
-  userRegister: userRegisterReducer,
   productCreate: productCreateReducer,
   productDelete: productDeleteReducer,
-  cartItems: cartReducer
+  cartItems: cartReducer,
+  userLogin: userLoginReducer,
+  userRegister: userRegisterReducer,
+  userProfileUpdate: userUpdateProfileReducer,
+  orderCreate: orderCreateReducer,
+  orderListMy: orderListMyReducer
 });
 
 
@@ -41,7 +57,8 @@ const initialState = {
   cartItems: cartItemsFromStorage,
   userLogin: {
       userInfo: userInfoFromStorage,
-      userTokens: userTokensFromStorage
+      userTokens: userTokensFromStorage,
+      deviceId: deviceIdFromStorage
   }
 };
 
